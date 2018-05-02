@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<style>
+    #chat{
+        height: 300px;
+        overflow: scroll;
+        border: #aaa;
+    }
+</style>
+<body>
+    <input type="text" id="message">
+    <button id="send" onclick=sendMess()>send</button>
+    <p id="chat"></p>
+</body>
+<script>
+var ws = new WebSocket('ws://localhost:8080');
+
+ws.onmessage = function (event) {
+  var chat = document.getElementById('chat');
+  //console.log(chat);
+  chat.innerHTML += event.data + "<br>";
+};
+
+ws.onopen = function() {
+  console.log("Соединение установлено.");
+};
+
+ws.onclose = function(event) {
+  if (event.wasClean) {
+    console.log('Соединение закрыто чисто');
+  } else {
+    console.log('Обрыв соединения'); // например, "убит" процесс сервера
+  }
+  console.log('Код: ' + event.code + ' причина: ' + event.reason);
+};
+
+function sendMess()
+{
+    var mess = document.getElementById('message').value;
+    if (mess == '') return false;
+    document.getElementById('message').value = '';
+    console.log('sending mess=' + mess);
+    ws.send(mess);
+}
+
+</script>
+</html>
